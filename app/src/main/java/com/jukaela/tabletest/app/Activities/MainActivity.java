@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.jukaela.tabletest.app.Misc.JsonAsyncTask;
+import com.jukaela.tabletest.app.AsyncTasks.JsonAsyncTask;
 import com.jukaela.tabletest.app.Models.ImageResponseObject;
 import com.jukaela.tabletest.app.R;
 import com.jukaela.tabletest.app.Misc.StableArrayAdapter;
@@ -20,14 +20,14 @@ import java.util.ArrayList;
 public class MainActivity extends Activity {
 
     public ListView listView;
-    private ArrayList<ImageResponseObject> dataSource;
+    private StableArrayAdapter listViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new JsonAsyncTask(this).execute("");
+        new JsonAsyncTask(this).execute("http://cold-planet-7717.herokuapp.com/microposts/images_from_feed.json");
 
         bindControls();
     }
@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ImageResponseObject selectedFromList = dataSource.get(i);
+                ImageResponseObject selectedFromList = listViewAdapter.getItem(i);
 
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(selectedFromList.getImageUrl().toString()));
                 startActivity(browserIntent);
@@ -46,18 +46,10 @@ public class MainActivity extends Activity {
         });
     }
 
-    public void setupListViewDataSource(ArrayList<ImageResponseObject> imageArray) {
-        final ArrayList<String> list = new ArrayList<String>();
+    public void setupListViewDataSource(ArrayList<ImageResponseObject> objectArray) {
+        this.listViewAdapter = new StableArrayAdapter(this, android.R.layout.simple_list_item_1, objectArray);
 
-        dataSource = imageArray;
-
-        for (ImageResponseObject tempObject : imageArray) {
-            list.add(tempObject.getFullCaption());
-        }
-
-        final StableArrayAdapter adapter = new StableArrayAdapter(this, android.R.layout.simple_list_item_1, list);
-
-        listView.setAdapter(adapter);
+        listView.setAdapter(this.listViewAdapter);
     }
 
     @Override

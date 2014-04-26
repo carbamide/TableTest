@@ -1,4 +1,4 @@
-package com.jukaela.tabletest.app.Misc;
+package com.jukaela.tabletest.app.AsyncTasks;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -28,7 +28,11 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class JsonAsyncTask extends AsyncTask<String, String, Void>{
+/**
+ * Created by jbarrow on 4/25/14.  Yay!
+ */
+
+ public class JsonAsyncTask extends AsyncTask<String, Integer, Void>{
 
     private ProgressDialog progressDialog;
 
@@ -47,6 +51,7 @@ public class JsonAsyncTask extends AsyncTask<String, String, Void>{
     protected void onPreExecute() {
         progressDialog.setMessage("Downloading your data...");
         progressDialog.show();
+
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             public void onCancel(DialogInterface arg0) {
                 JsonAsyncTask.this.cancel(true);
@@ -56,7 +61,7 @@ public class JsonAsyncTask extends AsyncTask<String, String, Void>{
 
     @Override
     protected Void doInBackground(String... params) {
-        String url_select = "http://cold-planet-7717.herokuapp.com/microposts/images_from_feed.json";
+        String url_select = params[0];
 
         try {
             HttpClient httpClient = new DefaultHttpClient();
@@ -116,7 +121,7 @@ public class JsonAsyncTask extends AsyncTask<String, String, Void>{
             for (int i = 0; i < jArray.length(); i++) {
                 JSONObject json = jArray.getJSONObject(i);
 
-                ImageResponseObject imageResponseObject = new ImageResponseObject();
+                ImageResponseObject imageResponseObject = new ImageResponseObject(callingActivity.getApplicationContext());
 
                 for(Iterator iter = json.keys(); iter.hasNext();) {
                     String key = (String)iter.next();
